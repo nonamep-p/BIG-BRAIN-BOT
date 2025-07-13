@@ -1,33 +1,386 @@
 import discord
 import random
-from typing import Dict, Any, List, Optional
+import asyncio
+from typing import Dict, List, Any, Optional, Union
 from datetime import datetime, timedelta
 import logging
-import time
-
-from config import COLORS, EMOJIS
 
 logger = logging.getLogger(__name__)
 
-def create_embed(title: str, description: str, color: int = COLORS['primary']) -> discord.Embed:
-    """Create a standardized embed."""
+def create_embed(title: str, description: str, color: int = 0x7289DA, thumbnail_url: str = None) -> discord.Embed:
+    """Create a standardized embed with enhanced styling."""
     embed = discord.Embed(
         title=title,
         description=description,
         color=color,
-        timestamp=datetime.now()
+        timestamp=datetime.utcnow()
     )
+
+    if thumbnail_url:
+        embed.set_thumbnail(url=thumbnail_url)
+
     return embed
 
-def format_number(num: int) -> str:
-    """Format large numbers with commas."""
-    return f"{num:,}"
+def create_advanced_embed(title: str, description: str, color: int = 0x7289DA, 
+                         embed_type: str = "info") -> discord.Embed:
+    """Create an advanced embed with type-specific styling."""
 
-def create_progress_bar(percentage: float, length: int = 10) -> str:
+    # Type-specific styling
+    type_configs = {
+        "success": {"color": 0x00ff00, "emoji": "✅"},
+        "error": {"color": 0xff0000, "emoji": "❌"},
+        "warning": {"color": 0xffff00, "emoji": "⚠️"},
+        "info": {"color": 0x0099ff, "emoji": "ℹ️"},
+        "battle": {"color": 0xff6600, "emoji": "⚔️"},
+        "shop": {"color": 0x9932cc, "emoji": "🛍️"},
+        "rpg": {"color": 0xffd700, "emoji": "🎮"}
+    }
+
+    config = type_configs.get(embed_type, type_configs["info"])
+
+    embed = discord.Embed(
+        title=f"{config['emoji']} {title}",
+        description=description,
+        color=config['color'],
+        timestamp=datetime.utcnow()
+    )
+
+    return embed
+
+def create_progress_bar(percentage: float, length: int = 10, fill_char: str = "█", 
+                       empty_char: str = "░") -> str:
     """Create a visual progress bar."""
-    filled = int(percentage / 100 * length)
+    filled = int(length * percentage / 100)
     empty = length - filled
-    return f"{'█' * filled}{'░' * empty} {percentage:.1f}%"
+
+    # Color coding based on percentage
+    if percentage > 70:
+        bar_color = "🟢"  # Green
+    elif percentage > 30:
+        bar_color = "🟡"  # Yellow
+    else:
+        bar_color = "🔴"  # Red
+
+    bar = fill_char * filled + empty_char * empty
+    return f"{bar_color} {bar} {percentage:.1f}%"
+
+def create_stat_display(stats: Dict[str, Any], title: str = "Stats") -> str:
+    """Create a formatted stat display."""
+    stat_lines = []
+
+    stat_emojis = {
+        "level": "📊",
+        "hp": "❤️",
+        "max_hp": "💗",
+        "attack": "⚔️",
+        "defense": "🛡️",
+        "mana": "💙",
+        "max_mana": "💫",
+        "coins": "💰",
+        "xp": "✨",
+        "luck": "🍀",
+        "energy": "⚡"
+    }
+
+    for stat_name, value in stats.items():
+        emoji = stat_emojis.get(stat_name, "▪️")
+        formatted_name = stat_name.replace("_", " ").title()
+
+        if isinstance(value, (int, float)):
+            if stat_name == "coins":
+                stat_lines.append(f"{emoji} **{formatted_name}:** {format_number(value)}")
+            else:
+                stat_lines.append(f"{emoji} **{formatted_name}:** {value}")
+        else:
+            stat_lines.append(f"{emoji} **{formatted_name}:** {value}")
+
+    return "\n".join(stat_lines)
+
+def create_battle_status_display(player_data: Dict[str, Any], enemy_data: Dict[str, Any]) -> str:
+    """Create a formatted battle status display."""
+    player_hp = player_data.get('hp', 100)
+    player_max_hp = player_data.get('max_hp', 100)
+    enemy_hp = enemy_data.get('hp', 100)
+    enemy_max_hp = enemy_data.get('max_hp', 100)
+
+    player_hp_bar = create_progress_bar((player_hp / player_max_hp) * 100)
+    enemy_hp_bar = create_progress_bar((enemy_hp / enemy_max_hp) * 100)
+
+    return f"""
+**🧑‍⚔️ You**
+{player_hp_bar}
+HP: {player_hp}/{player_max_hp}
+ATK: {player_data.get('attack', 10)} | DEF: {player_data.get('defense', 5)}
+
+**👹 {enemy_data.get('name', 'Enemy')}**
+{enemy_hp_bar}
+HP: {enemy_hp}/{enemy_max_hp}
+ATK: {enemy_data.get('attack', 10)} | DEF: {enemy_data.get('defense', 5)}
+"""
+
+def format_number(number: Union[int, float]) -> str:
+    """Format large numbers with appropriate suffixes."""
+    if number >= 1_000_000_000:
+        return f"{number/1_000_000_000:.1f}B"
+    elif number >= 1_000_000:
+        return f"{number/1_000_000:.1f}M"
+    elif number >= 1_000:
+        return f"{number/1_000:.1f}K"
+    else:
+        return str(int(number))
+
+def create_inventory_display(inventory: List[str], equipped: Dict[str, str] = None) -> str:
+    """Create a formatted inventory display."""
+    if not inventory:
+        return "🎒 **Empty inventory**\n*Go shopping or complete adventures to get items!*"
+
+    # Group items by type
+    item_groups = {}
+    for item in inventory:
+        # Simple categorization - you can expand this
+        if any(weapon in item.lower() for weapon in ['sword', 'axe', 'staff', 'blade']):
+            category = "⚔️ Weapons"
+        elif any(armor in item.lower() for armor in ['armor', 'shield', 'helmet', 'boots']):
+            category = "🛡️ Armor"
+        elif any(consumable in item.lower() for consumable in ['potion', 'food', 'scroll']):
+            category = "🧪 Consumables"
+        else:
+            category = "📦 Other Items"
+
+        if category not in item_groups:
+            item_groups[category] = []
+        item_groups[category].append(item)
+
+    display_lines = []
+    for category, items in item_groups.items():
+        display_lines.append(f"\n**{category}**")
+        for item in items[:5]:  # Show first 5 items per category
+            equipped_marker = " ⚡" if equipped and item in equipped.values() else ""
+            display_lines.append(f"• {item}{equipped_marker}")
+        if len(items) > 5:
+            display_lines.append(f"• ... and {len(items) - 5} more")
+
+    return "\n".join(display_lines)
+
+def create_leaderboard_display(leaderboard_data: List[Dict[str, Any]], 
+                              title: str = "Leaderboard") -> discord.Embed:
+    """Create a formatted leaderboard display."""
+    embed = discord.Embed(
+        title=f"🏆 {title}",
+        color=0xffd700,
+        timestamp=datetime.utcnow()
+    )
+
+    if not leaderboard_data:
+        embed.description = "No data available yet!"
+        return embed
+
+    # Medal emojis for top 3
+    medals = ["🥇", "🥈", "🥉"]
+
+    leaderboard_text = ""
+    for i, entry in enumerate(leaderboard_data[:10]):  # Top 10
+        position = i + 1
+        medal = medals[i] if i < 3 else f"{position}."
+
+        username = entry.get('username', 'Unknown')
+        value = entry.get('value', 0)
+
+        # Format value based on type
+        if isinstance(value, (int, float)):
+            if 'coins' in title.lower():
+                formatted_value = format_number(value)
+            else:
+                formatted_value = str(value)
+        else:
+            formatted_value = str(value)
+
+        leaderboard_text += f"{medal} **{username}** - {formatted_value}\n"
+
+    embed.description = leaderboard_text
+    embed.set_footer(text=f"Updated: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC")
+
+    return embed
+
+def create_shop_item_display(item_data: Dict[str, Any], user_coins: int = 0) -> discord.Embed:
+    """Create a detailed shop item display."""
+    from utils.constants import RARITY_COLORS
+
+    name = item_data.get('name', 'Unknown Item')
+    description = item_data.get('description', 'No description available.')
+    price = item_data.get('price', 0)
+    rarity = item_data.get('rarity', 'common')
+
+    color = RARITY_COLORS.get(rarity, 0x808080)
+
+    embed = discord.Embed(
+        title=f"🛍️ {name}",
+        description=description,
+        color=color
+    )
+
+    # Stats display
+    stats = []
+    if item_data.get('attack'):
+        stats.append(f"⚔️ Attack: +{item_data['attack']}")
+    if item_data.get('defense'):
+        stats.append(f"🛡️ Defense: +{item_data['defense']}")
+    if item_data.get('hp'):
+        stats.append(f"❤️ HP: +{item_data['hp']}")
+    if item_data.get('mana'):
+        stats.append(f"💙 Mana: +{item_data['mana']}")
+
+    if stats:
+        embed.add_field(
+            name="📊 Stats",
+            value="\n".join(stats),
+            inline=True
+        )
+
+    # Price and affordability
+    can_afford = user_coins >= price
+    afford_text = "✅ You can afford this!" if can_afford else f"❌ Need {format_number(price - user_coins)} more coins"
+
+    embed.add_field(
+        name="💰 Price",
+        value=f"{format_number(price)} coins\n{afford_text}",
+        inline=True
+    )
+
+    # Rarity indicator
+    rarity_emojis = {
+        'common': '⚪',
+        'uncommon': '🟢',
+        'rare': '🔵',
+        'epic': '🟣',
+        'legendary': '🟠',
+        'mythic': '🔴'
+    }
+
+    rarity_emoji = rarity_emojis.get(rarity, '⚪')
+    embed.add_field(
+        name="✨ Rarity",
+        value=f"{rarity_emoji} {rarity.title()}",
+        inline=True
+    )
+
+    return embed
+
+def calculate_battle_damage(attacker_stats: Dict[str, Any], defender_stats: Dict[str, Any]) -> int:
+    """Calculate damage in battle."""
+    attack = attacker_stats.get('attack', 10)
+    defense = defender_stats.get('defense', 5)
+
+    # Base damage calculation
+    base_damage = max(1, attack - defense)
+
+    # Add some randomness (80% - 120% of base damage)
+    damage_multiplier = random.uniform(0.8, 1.2)
+    final_damage = int(base_damage * damage_multiplier)
+
+    return max(1, final_damage)
+
+def generate_random_stats() -> Dict[str, int]:
+    """Generate random stats for monsters/items."""
+    return {
+        'hp': random.randint(50, 150),
+        'attack': random.randint(8, 20),
+        'defense': random.randint(3, 12)
+    }
+
+def format_time_remaining(seconds):
+    """Format time remaining in a readable format."""
+    if seconds <= 0:
+        return "Ready!"
+
+    hours = seconds // 3600
+    minutes = (seconds % 3600) // 60
+    seconds = seconds % 60
+
+    if hours > 0:
+        return f"{hours}h {minutes}m"
+    elif minutes > 0:
+        return f"{minutes}m {seconds}s"
+    else:
+        return f"{seconds}s"
+
+def create_animated_embed(title: str, description: str, color: int = 0x7289DA) -> discord.Embed:
+    """Create an embed with animated elements."""
+    # Add loading bars or spinning elements
+    animations = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+    spinner = random.choice(animations)
+
+    embed = discord.Embed(
+        title=f"{spinner} {title}",
+        description=description,
+        color=color,
+        timestamp=datetime.utcnow()
+    )
+
+    return embed
+
+def create_quest_display(quest_data: Dict[str, Any]) -> str:
+    """Create a formatted quest display."""
+    title = quest_data.get('title', 'Unknown Quest')
+    description = quest_data.get('description', 'No description')
+    progress = quest_data.get('progress', 0)
+    target = quest_data.get('target', 1)
+    reward = quest_data.get('reward', {})
+
+    progress_bar = create_progress_bar((progress / target) * 100)
+
+    quest_text = f"**📜 {title}**\n"
+    quest_text += f"{description}\n\n"
+    quest_text += f"**Progress:** {progress}/{target}\n"
+    quest_text += f"{progress_bar}\n\n"
+
+    if reward:
+        quest_text += "**Rewards:**\n"
+        for reward_type, amount in reward.items():
+            emoji = "💰" if reward_type == "coins" else "✨" if reward_type == "xp" else "🎁"
+            quest_text += f"{emoji} {reward_type.title()}: {format_number(amount)}\n"
+
+    return quest_text
+
+async def send_paginated_embed(ctx, embeds: List[discord.Embed], timeout: int = 60):
+    """Send a paginated embed with navigation."""
+    if not embeds:
+        return
+
+    current_page = 0
+    message = await ctx.send(embed=embeds[current_page])
+
+    if len(embeds) == 1:
+        return
+
+    # Add navigation reactions
+    await message.add_reaction("⬅️")
+    await message.add_reaction("➡️")
+    await message.add_reaction("❌")
+
+    def check(reaction, user):
+        return (user == ctx.author and 
+                str(reaction.emoji) in ["⬅️", "➡️", "❌"] and 
+                reaction.message.id == message.id)
+
+    while True:
+        try:
+            reaction, user = await ctx.bot.wait_for("reaction_add", timeout=timeout, check=check)
+
+            if str(reaction.emoji) == "⬅️":
+                current_page = (current_page - 1) % len(embeds)
+            elif str(reaction.emoji) == "➡️":
+                current_page = (current_page + 1) % len(embeds)
+            elif str(reaction.emoji) == "❌":
+                await message.delete()
+                return
+
+            await message.edit(embed=embeds[current_page])
+            await message.remove_reaction(reaction, user)
+
+        except asyncio.TimeoutError:
+            await message.clear_reactions()
+            break
 
 def get_random_work_job() -> Dict[str, Any]:
     """Get a random work job with Plagg theme."""
@@ -105,382 +458,6 @@ def level_up_player(player_data: Dict[str, Any]) -> Optional[str]:
                 f"Coins +{coin_bonus}")
 
     return None
-
-def calculate_battle_damage(attacker_stats: Dict[str, Any], defender_stats: Dict[str, Any]) -> int:
-    """Calculate damage in battle."""
-    attack = attacker_stats.get('attack', 10)
-    defense = defender_stats.get('defense', 5)
-
-    # Base damage calculation
-    base_damage = max(1, attack - defense)
-
-    # Add some randomness (80% - 120% of base damage)
-    damage_multiplier = random.uniform(0.8, 1.2)
-    final_damage = int(base_damage * damage_multiplier)
-
-    return max(1, final_damage)
-
-def generate_random_stats() -> Dict[str, int]:
-    """Generate random stats for monsters/items."""
-    return {
-        'hp': random.randint(50, 150),
-        'attack': random.randint(8, 20),
-        'defense': random.randint(3, 12)
-    }
-
-def format_time_remaining(seconds):
-    """Format time remaining in a readable format."""
-    if seconds <= 0:
-        return "Ready!"
-
-    hours = seconds // 3600
-    minutes = (seconds % 3600) // 60
-    seconds = seconds % 60
-
-    if hours > 0:
-        return f"{hours}h {minutes}m"
-    elif minutes > 0:
-        return f"{minutes}m {seconds}s"
-    else:
-        return f"{seconds}s"
-
-def check_weapon_unlock_conditions(player_data, weapon_name):
-    """Check if player meets unlock conditions for a weapon."""
-    from utils.constants import WEAPON_UNLOCK_CONDITIONS
-
-    if weapon_name not in WEAPON_UNLOCK_CONDITIONS:
-        return True, "No special conditions"
-
-    conditions = WEAPON_UNLOCK_CONDITIONS[weapon_name]["requirements"]
-    failed_conditions = []
-
-    for condition in conditions:
-        if condition["type"] == "boss_defeat":
-            # Check if player has defeated the required boss
-            boss_defeats = player_data.get("boss_defeats", {})
-            boss_name = condition["boss"]
-
-            if boss_name not in boss_defeats:
-                failed_conditions.append(f"Must defeat {boss_name.replace('_', ' ').title()}")
-            elif condition.get("player_level_max"):
-                # Check if they were low enough level when they defeated it
-                defeat_data = boss_defeats[boss_name]
-                if defeat_data.get("player_level", 999) > condition["player_level_max"]:
-                    failed_conditions.append(f"Must defeat {boss_name.replace('_', ' ').title()} at level {condition['player_level_max']} or lower")
-
-        elif condition["type"] == "class_unlock":
-            required_class = condition["class"]
-            if player_data.get("player_class") != required_class:
-                failed_conditions.append(f"Must be {required_class.replace('_', ' ').title()} class")
-
-        elif condition["type"] == "health_condition":
-            # This would be checked during combat, not here
-            failed_conditions.append(f"Must complete challenge at {condition['max_hp_percent']}% HP or lower")
-
-        elif condition["type"] == "dungeon_clear":
-            dungeon_clears = player_data.get("dungeon_clears", {})
-            dungeon_name = condition["dungeon"]
-            required_floors = condition.get("floors", 1)
-
-            if dungeon_name not in dungeon_clears or dungeon_clears[dungeon_name] < required_floors:
-                failed_conditions.append(f"Must clear {dungeon_name.replace('_', ' ').title()} ({required_floors} floors)")
-
-        elif condition["type"] == "item_required":
-            inventory = player_data.get("inventory", [])
-            required_item = condition["item"]
-
-            if required_item not in inventory:
-                failed_conditions.append(f"Must possess {required_item.replace('_', ' ').title()}")
-
-    return len(failed_conditions) == 0, failed_conditions
-
-def award_weapon_unlock(player_data, weapon_name):
-    """Award a special weapon to the player."""
-    from utils.constants import WEAPON_UNLOCK_CONDITIONS
-
-    # Add to inventory
-    inventory = player_data.get("inventory", [])
-    if weapon_name not in inventory:
-        inventory.append(weapon_name)
-        player_data["inventory"] = inventory
-
-    # Record the unlock
-    unlocked_weapons = player_data.get("unlocked_weapons", [])
-    if weapon_name not in unlocked_weapons:
-        unlocked_weapons.append(weapon_name)
-        player_data["unlocked_weapons"] = unlocked_weapons
-
-    # Get unlock message
-    unlock_info = WEAPON_UNLOCK_CONDITIONS.get(weapon_name, {})
-    unlock_message = unlock_info.get("unlock_message", f"You have unlocked {weapon_name}!")
-
-    return unlock_message
-
-def level_up_profession(player_data, profession, xp_gained):
-    """Handle profession leveling with XP gain."""
-    if not profession:
-        return None
-
-    current_level = player_data.get('profession_level', 1)
-    current_xp = player_data.get('profession_xp', 0)
-
-    new_xp = current_xp + xp_gained
-    player_data['profession_xp'] = new_xp
-
-    # Calculate XP needed for next level (profession levels are harder)
-    xp_needed = 200 * (current_level ** 1.2)
-
-    if new_xp >= xp_needed:
-        new_level = current_level + 1
-        remaining_xp = new_xp - xp_needed
-
-        player_data['profession_level'] = new_level
-        player_data['profession_xp'] = remaining_xp
-
-        return f"🔨 Profession Level Up! {profession.title()} is now level {new_level}!"
-
-    return None
-
-def calculate_craft_success_rate(player_data, recipe):
-    """Calculate crafting success rate based on player skill."""
-    base_rate = recipe.get('success_rate', 0.5)
-    profession_level = player_data.get('profession_level', 1)
-
-    # Higher level = better success rate
-    level_bonus = min(0.3, profession_level * 0.02)  # Max 30% bonus
-
-    # Luck bonus
-    luck_points = player_data.get('luck_points', 0)
-    luck_bonus = min(0.1, luck_points / 1000)  # Max 10% from luck
-
-    final_rate = min(0.95, base_rate + level_bonus + luck_bonus)  # Cap at 95%
-    return final_rate
-
-def calculate_prestige_cost(level):
-    """Calculate cost for prestiging based on level."""
-    base_cost = 10000
-    level_multiplier = level * 100
-    return base_cost + level_multiplier
-
-def format_faction_info(faction_name):
-    """Format faction information for display."""
-    from utils.constants import FACTIONS
-
-    if faction_name not in FACTIONS:
-        return "Unknown faction"
-
-    faction = FACTIONS[faction_name]
-    info = f"**{faction['name']}**\n"
-    info += f"{faction['description']}\n\n"
-    info += f"**Alignment:** {faction['alignment'].title()}\n"
-    info += f"**Perks:** {', '.join(faction['perks'])}\n"
-
-    if faction['enemies']:
-        info += f"**Enemies:** {', '.join([FACTIONS[e]['name'] for e in faction['enemies']])}"
-
-    return info
-
-def generate_dynamic_quest(user_id, quest_type):
-    """Generate a dynamic quest based on type."""
-    from utils.constants import QUEST_TYPES
-    import random
-
-    if quest_type not in QUEST_TYPES:
-        return None
-
-    quest_template = QUEST_TYPES[quest_type]
-
-    # Generate basic quest structure
-    quest = {
-        'id': f"quest_{user_id}_{int(time.time())}",
-        'type': quest_type,
-        'title': f"Dynamic {quest_template['name']}",
-        'description': quest_template['description'],
-        'location': random.choice(['paris_streets', 'cheese_dimension', 'kwami_realm']),
-        'progress': 0,
-        'target': random.randint(5, 15),
-        'rewards': quest_template['rewards'],
-        'created_at': time.time()
-    }
-
-    return quest
-
-def format_quest_progress(quest):
-    """Format quest progress for display."""
-    progress = quest.get('progress', 0)
-    target = quest.get('target', 1)
-    percentage = (progress / target) * 100 if target > 0 else 0
-
-    progress_bar = create_progress_bar(percentage)
-    return f"Progress: {progress}/{target}\n{progress_bar}"
-
-def get_time_until_next_use(last_use: Optional[datetime], cooldown_seconds: int) -> int:
-    """Get seconds until next use of a cooldown-based command."""
-    if not last_use:
-        return 0
-
-    next_use = last_use + timedelta(seconds=cooldown_seconds)
-    now = datetime.now()
-
-    if now >= next_use:
-        return 0
-
-    return int((next_use - now).total_seconds())
-
-def get_rarity_color(rarity: str) -> int:
-    """Get color for item rarity."""
-    rarity_colors = {
-        'common': 0x95A5A6,      # Gray
-        'uncommon': 0x2ECC71,    # Green
-        'rare': 0x3498DB,        # Blue
-        'epic': 0x9B59B6,        # Purple
-        'legendary': 0xF39C12,   # Orange
-        'mythical': 0xE74C3C     # Red
-    }
-    return rarity_colors.get(rarity.lower(), 0x95A5A6)
-
-def get_rarity_emoji(rarity: str) -> str:
-    """Get emoji for item rarity."""
-    rarity_emojis = {
-        'common': '⚪',
-        'uncommon': '🟢',
-        'rare': '🔵',
-        'epic': '🟣',
-        'legendary': '🟠',
-        'mythical': '🔴'
-    }
-    return rarity_emojis.get(rarity.lower(), '⚪')
-
-def deduplicate_items(items_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Remove duplicate items based on ID or name."""
-    seen_ids = set()
-    seen_names = set()
-    unique_items = []
-    
-    for item in items_list:
-        item_id = item.get('id')
-        item_name = item.get('name')
-        
-        # Use ID if available, otherwise use name
-        identifier = item_id if item_id else item_name
-        
-        if item_id and item_id not in seen_ids:
-            seen_ids.add(item_id)
-            unique_items.append(item)
-        elif not item_id and item_name and item_name not in seen_names:
-            seen_names.add(item_name)
-            unique_items.append(item)
-    
-    return unique_items
-
-def format_shop_item(item_data: Dict[str, Any]) -> str:
-    """Format a single shop item for display."""
-    rarity = item_data.get('rarity', 'common')
-    emoji = get_rarity_emoji(rarity)
-    name = item_data.get('name', 'Unknown Item')
-    price = item_data.get('price', 0)
-    
-    # Add attack/defense info if it's a weapon/armor
-    stats = []
-    if item_data.get('attack'):
-        stats.append(f"⚔️{item_data['attack']}")
-    if item_data.get('defense'):
-        stats.append(f"🛡️{item_data['defense']}")
-    
-    stats_str = f" ({'/'.join(stats)})" if stats else ""
-    
-    return f"{emoji} **{name}**{stats_str} - {format_number(price)} coins"
-
-def clear_item_cache():
-    """Clear any cached item data to prevent duplicates."""
-    logger.info("Item cache cleared")
-    return True
-
-def validate_shop_data() -> Dict[str, Any]:
-    """Validate shop data for duplicates and errors."""
-    from utils.constants import SHOP_ITEMS
-    
-    validation_results = {
-        "total_items": len(SHOP_ITEMS),
-        "duplicates_found": [],
-        "missing_data": [],
-        "valid": True
-    }
-    
-    seen_names = set()
-    
-    # Check for required fields and name duplicates
-    for item_id, item_data in SHOP_ITEMS.items():
-        # Check required fields
-        if not item_data.get('name'):
-            validation_results["missing_data"].append(f"Item {item_id} missing name")
-            validation_results["valid"] = False
-        if not item_data.get('price'):
-            validation_results["missing_data"].append(f"Item {item_id} missing price")
-            validation_results["valid"] = False
-        if not item_data.get('category'):
-            validation_results["missing_data"].append(f"Item {item_id} missing category")
-            validation_results["valid"] = False
-            
-        # Check for duplicate names
-        name = item_data.get('name')
-        if name:
-            if name in seen_names:
-                validation_results["duplicates_found"].append(f"Duplicate name: {name}")
-                validation_results["valid"] = False
-            seen_names.add(name)
-    
-    return validation_results
-
-def truncate_text(text: str, max_length: int = 1000) -> str:
-    """Truncate text to fit within Discord limits."""
-    if len(text) <= max_length:
-        return text
-
-    return text[:max_length-3] + "..."
-
-def get_user_display_name(user: discord.User) -> str:
-    """Get the best display name for a user."""
-    return getattr(user, 'display_name', user.name)
-
-def create_success_embed(title: str, description: str) -> discord.Embed:
-    """Create a success embed."""
-    return create_embed(title, description, COLORS['success'])
-
-def create_error_embed(title: str, description: str) -> discord.Embed:
-    """Create an error embed."""
-    return create_embed(title, description, COLORS['error'])
-
-def create_warning_embed(title: str, description: str) -> discord.Embed:
-    """Create a warning embed."""
-    return create_embed(title, description, COLORS['warning'])
-
-def create_info_embed(title: str, description: str) -> discord.Embed:
-    """Create an info embed."""
-    return create_embed(title, description, COLORS['info'])
-
-def format_duration(seconds: int) -> str:
-    """Format duration in seconds to human readable format."""
-    if seconds < 60:
-        return f"{seconds} seconds"
-    elif seconds < 3600:
-        minutes = seconds // 60
-        remaining_seconds = seconds % 60
-        if remaining_seconds > 0:
-            return f"{minutes} minutes, {remaining_seconds} seconds"
-        return f"{minutes} minutes"
-    elif seconds < 86400:
-        hours = seconds // 3600
-        remaining_minutes = (seconds % 3600) // 60
-        if remaining_minutes > 0:
-            return f"{hours} hours, {remaining_minutes} minutes"
-        return f"{hours} hours"
-    else:
-        days = seconds // 86400
-        remaining_hours = (seconds % 86400) // 3600
-        if remaining_hours > 0:
-            return f"{days} days, {remaining_hours} hours"
-        return f"{days} days"
 
 def check_weapon_unlock_conditions(user_id: str, weapon_name: str) -> tuple[bool, str]:
     """Check if user meets weapon unlock conditions."""
@@ -599,3 +576,162 @@ def format_weapon_info(weapon_name: str) -> str:
         info += f"✨ Special: {weapon['special'].replace('_', ' ').title()}\n"
 
     return info
+
+def format_number(num: int) -> str:
+    """Format large numbers with commas."""
+    return f"{num:,}"
+
+def deduplicate_items(items_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    """Remove duplicate items based on ID or name."""
+    seen_ids = set()
+    seen_names = set()
+    unique_items = []
+    
+    for item in items_list:
+        item_id = item.get('id')
+        item_name = item.get('name')
+        
+        # Use ID if available, otherwise use name
+        identifier = item_id if item_id else item_name
+        
+        if item_id and item_id not in seen_ids:
+            seen_ids.add(item_id)
+            unique_items.append(item)
+        elif not item_id and item_name and item_name not in seen_names:
+            seen_names.add(item_name)
+            unique_items.append(item)
+    
+    return unique_items
+
+def format_shop_item(item_data: Dict[str, Any]) -> str:
+    """Format a single shop item for display."""
+    rarity = item_data.get('rarity', 'common')
+    emoji = get_rarity_emoji(rarity)
+    name = item_data.get('name', 'Unknown Item')
+    price = item_data.get('price', 0)
+    
+    # Add attack/defense info if it's a weapon/armor
+    stats = []
+    if item_data.get('attack'):
+        stats.append(f"⚔️{item_data['attack']}")
+    if item_data.get('defense'):
+        stats.append(f"🛡️{item_data['defense']}")
+    
+    stats_str = f" ({'/'.join(stats)})" if stats else ""
+    
+    return f"{emoji} **{name}**{stats_str} - {format_number(price)} coins"
+
+def clear_item_cache():
+    """Clear any cached item data to prevent duplicates."""
+    logger.info("Item cache cleared")
+    return True
+
+def validate_shop_data() -> Dict[str, Any]:
+    """Validate shop data for duplicates and errors."""
+    from utils.constants import SHOP_ITEMS
+    
+    validation_results = {
+        "total_items": len(SHOP_ITEMS),
+        "duplicates_found": [],
+        "missing_data": [],
+        "valid": True
+    }
+    
+    seen_names = set()
+    
+    # Check for required fields and name duplicates
+    for item_id, item_data in SHOP_ITEMS.items():
+        # Check required fields
+        if not item_data.get('name'):
+            validation_results["missing_data"].append(f"Item {item_id} missing name")
+            validation_results["valid"] = False
+        if not item_data.get('price'):
+            validation_results["missing_data"].append(f"Item {item_id} missing price")
+            validation_results["valid"] = False
+        if not item_data.get('category'):
+            validation_results["missing_data"].append(f"Item {item_id} missing category")
+            validation_results["valid"] = False
+            
+        # Check for duplicate names
+        name = item_data.get('name')
+        if name:
+            if name in seen_names:
+                validation_results["duplicates_found"].append(f"Duplicate name: {name}")
+                validation_results["valid"] = False
+            seen_names.add(name)
+    
+    return validation_results
+
+def truncate_text(text: str, max_length: int = 1000) -> str:
+    """Truncate text to fit within Discord limits."""
+    if len(text) <= max_length:
+        return text
+
+    return text[:max_length-3] + "..."
+
+def get_user_display_name(user: discord.User) -> str:
+    """Get the best display name for a user."""
+    return getattr(user, 'display_name', user.name)
+
+def create_success_embed(title: str, description: str) -> discord.Embed:
+    """Create a success embed."""
+    return create_embed(title, description, 0x00ff00)
+
+def create_error_embed(title: str, description: str) -> discord.Embed:
+    """Create an error embed."""
+    return create_embed(title, description, 0xff0000)
+
+def create_warning_embed(title: str, description: str) -> discord.Embed:
+    """Create a warning embed."""
+    return create_embed(title, description, 0xffff00)
+
+def create_info_embed(title: str, description: str) -> discord.Embed:
+    """Create an info embed."""
+    return create_embed(title, description, 0x0099ff)
+
+def format_duration(seconds: int) -> str:
+    """Format duration in seconds to human readable format."""
+    if seconds < 60:
+        return f"{seconds} seconds"
+    elif seconds < 3600:
+        minutes = seconds // 60
+        remaining_seconds = seconds % 60
+        if remaining_seconds > 0:
+            return f"{minutes} minutes, {remaining_seconds} seconds"
+        return f"{minutes} minutes"
+    elif seconds < 86400:
+        hours = seconds // 3600
+        remaining_minutes = (seconds % 3600) // 60
+        if remaining_minutes > 0:
+            return f"{hours} hours, {remaining_minutes} minutes"
+        return f"{hours} hours"
+    else:
+        days = seconds // 86400
+        remaining_hours = (seconds % 86400) // 3600
+        if remaining_hours > 0:
+            return f"{days} days, {remaining_hours} hours"
+        return f"{days} days"
+
+def get_rarity_color(rarity: str) -> int:
+    """Get color for item rarity."""
+    rarity_colors = {
+        'common': 0x95A5A6,      # Gray
+        'uncommon': 0x2ECC71,    # Green
+        'rare': 0x3498DB,        # Blue
+        'epic': 0x9B59B6,        # Purple
+        'legendary': 0xF39C12,   # Orange
+        'mythical': 0xE74C3C     # Red
+    }
+    return rarity_colors.get(rarity.lower(), 0x95A5A6)
+
+def get_rarity_emoji(rarity: str) -> str:
+    """Get emoji for item rarity."""
+    rarity_emojis = {
+        'common': '⚪',
+        'uncommon': '🟢',
+        'rare': '🔵',
+        'epic': '🟣',
+        'legendary': '🟠',
+        'mythical': '🔴'
+    }
+    return rarity_emojis.get(rarity.lower(), '⚪')

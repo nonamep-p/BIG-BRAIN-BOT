@@ -63,6 +63,59 @@ async def on_ready():
     except Exception as e:
         logger.error(f"Error setting bot presence: {e}")
 
+    # Send online message to all guilds
+    for guild in bot.guilds:
+        try:
+            # Find appropriate channel
+            channel = None
+            for ch in guild.text_channels:
+                if ch.name.lower() in ['general', 'bot-commands', 'bots'] and ch.permissions_for(guild.me).send_messages:
+                    channel = ch
+                    break
+            
+            if channel:
+                embed = discord.Embed(
+                    title="🟢 Plagg is Online!",
+                    description="*\"Ah, finally! Time to cause some chaos with cheese!\"* 🧀\n\n"
+                               "🤖 **AI Chat Ready** - Mention me to chat!\n"
+                               "🎮 **RPG Adventures** - Use `$start` to begin\n"
+                               "📊 **All Systems** - Fully operational",
+                    color=0x00ff00
+                )
+                embed.set_footer(text="Plagg - Ready for destruction and cheese!")
+                await channel.send(embed=embed)
+        except Exception as e:
+            logger.error(f"Error sending online message to {guild.name}: {e}")
+
+@bot.event
+async def on_disconnect():
+    """Called when the bot disconnects."""
+    logger.info("Plagg is going offline...")
+    
+    # Send offline message to all guilds
+    for guild in bot.guilds:
+        try:
+            # Find appropriate channel
+            channel = None
+            for ch in guild.text_channels:
+                if ch.name.lower() in ['general', 'bot-commands', 'bots'] and ch.permissions_for(guild.me).send_messages:
+                    channel = ch
+                    break
+            
+            if channel:
+                embed = discord.Embed(
+                    title="🔴 Plagg is Going Offline",
+                    description="*\"Time for a cheese break! I'll be back soon!\"* 🧀\n\n"
+                               "⚠️ **Maintenance Mode** - Temporary downtime\n"
+                               "🔄 **Auto-Restart** - I'll be back shortly\n"
+                               "💤 **Rest Mode** - Recharging kwami energy",
+                    color=0xff0000
+                )
+                embed.set_footer(text="Plagg - Offline for maintenance")
+                await channel.send(embed=embed)
+        except Exception as e:
+            logger.error(f"Error sending offline message to {guild.name}: {e}")
+
 @bot.event
 async def on_guild_join(guild):
     """Called when the bot joins a new guild."""

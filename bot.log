@@ -707,3 +707,64 @@ discord.app_commands.errors.CommandNotFound: Application command 'pay' not found
 2025-07-13 18:50:28,905 - __main__ - INFO - Plagg is causing chaos in 2 guilds
 2025-07-13 18:50:29,203 - utils.database - INFO - Database initialization complete
 2025-07-13 18:50:29,204 - __main__ - INFO - Database initialized successfully
+2025-07-13 22:17:23,689 - discord.client - WARNING - PyNaCl is not installed, voice will NOT be supported
+2025-07-13 22:17:23,690 - web_server - INFO - Starting web server on port 5000
+2025-07-13 22:17:23,698 - __main__ - INFO - Loaded cog: cogs.admin
+2025-07-13 22:17:23,707 - __main__ - INFO - Loaded cog: cogs.moderation
+2025-07-13 22:17:23,744 - __main__ - INFO - Loaded cog: cogs.rpg_games
+2025-07-13 22:17:25,129 - cogs.ai_chatbot - INFO - ✅ AI client initialized successfully
+2025-07-13 22:17:25,130 - __main__ - INFO - Loaded cog: cogs.ai_chatbot
+2025-07-13 22:17:25,131 - __main__ - INFO - Loaded cog: cogs.help
+2025-07-13 22:17:25,131 - discord.client - INFO - logging in using static token
+2025-07-13 22:17:26,889 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 380108637d9a74e5d52161c08426b3dc).
+2025-07-13 22:17:28,978 - __main__ - INFO - Plagg (Kwami of Destruction) has awakened! 🧀
+2025-07-13 22:17:28,978 - __main__ - INFO - Plagg is causing chaos in 2 guilds
+2025-07-13 22:17:29,583 - utils.database - INFO - Database initialization complete
+2025-07-13 22:17:29,583 - __main__ - INFO - Database initialized successfully
+2025-07-13 22:27:12,147 - google_genai.models - INFO - AFC is enabled with max remote calls: 10.
+2025-07-13 22:27:17,136 - httpx - INFO - HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent "HTTP/1.1 200 OK"
+2025-07-13 22:27:17,137 - google_genai.models - INFO - AFC remote call 1 is done.
+2025-07-13 22:27:36,060 - discord.client - WARNING - PyNaCl is not installed, voice will NOT be supported
+2025-07-13 22:27:36,061 - web_server - INFO - Starting web server on port 5000
+2025-07-13 22:27:36,075 - __main__ - INFO - Loaded cog: cogs.admin
+2025-07-13 22:27:36,081 - __main__ - INFO - Loaded cog: cogs.moderation
+2025-07-13 22:27:36,126 - __main__ - INFO - Loaded cog: cogs.rpg_games
+2025-07-13 22:27:36,817 - cogs.ai_chatbot - INFO - ✅ AI client initialized successfully
+2025-07-13 22:27:36,817 - __main__ - INFO - Loaded cog: cogs.ai_chatbot
+2025-07-13 22:27:36,818 - __main__ - INFO - Loaded cog: cogs.help
+2025-07-13 22:27:36,819 - discord.client - INFO - logging in using static token
+2025-07-13 22:27:38,517 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 6021b4fc50212d4e6d529d7a0083c4f1).
+2025-07-13 22:27:40,606 - __main__ - INFO - Plagg (Kwami of Destruction) has awakened! 🧀
+2025-07-13 22:27:40,606 - __main__ - INFO - Plagg is causing chaos in 2 guilds
+2025-07-13 22:27:40,955 - utils.database - INFO - Database initialization complete
+2025-07-13 22:27:40,955 - __main__ - INFO - Database initialized successfully
+2025-07-13 22:28:11,936 - utils.database - INFO - Created new user profile for 1297013439125917766
+2025-07-13 22:28:13,707 - utils.database - INFO - Created new user profile for 1270306976873578578
+2025-07-13 22:32:38,288 - discord.client - WARNING - PyNaCl is not installed, voice will NOT be supported
+2025-07-13 22:32:38,288 - web_server - INFO - Starting web server on port 5000
+2025-07-13 22:32:38,291 - __main__ - INFO - Loaded cog: cogs.admin
+2025-07-13 22:32:38,294 - __main__ - INFO - Loaded cog: cogs.moderation
+2025-07-13 22:32:38,338 - __main__ - INFO - Loaded cog: cogs.rpg_games
+2025-07-13 22:32:38,971 - cogs.ai_chatbot - INFO - ✅ AI client initialized successfully
+2025-07-13 22:32:38,972 - __main__ - INFO - Loaded cog: cogs.ai_chatbot
+2025-07-13 22:32:38,973 - __main__ - INFO - Loaded cog: cogs.help
+2025-07-13 22:32:38,973 - discord.client - INFO - logging in using static token
+2025-07-13 22:32:40,602 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 99da8e8b84fd89283a595760216b33fc).
+2025-07-13 22:32:42,839 - __main__ - INFO - Plagg (Kwami of Destruction) has awakened! 🧀
+2025-07-13 22:32:42,839 - __main__ - INFO - Plagg is causing chaos in 2 guilds
+2025-07-13 22:32:43,147 - utils.database - INFO - Database initialization complete
+2025-07-13 22:32:43,147 - __main__ - INFO - Database initialized successfully
+2025-07-13 23:22:01,336 - discord.client - WARNING - PyNaCl is not installed, voice will NOT be supported
+2025-07-13 23:22:01,337 - web_server - INFO - Starting web server on port 5000
+2025-07-13 23:22:01,339 - __main__ - INFO - Loaded cog: cogs.admin
+2025-07-13 23:22:01,343 - __main__ - INFO - Loaded cog: cogs.moderation
+2025-07-13 23:22:01,364 - __main__ - ERROR - Failed to load cog cogs.rpg_games: Extension 'cogs.rpg_games' raised an error: SyntaxError: invalid syntax (rpg_games.py, line 825)
+2025-07-13 23:22:02,092 - cogs.ai_chatbot - INFO - ✅ AI client initialized successfully
+2025-07-13 23:22:02,093 - __main__ - INFO - Loaded cog: cogs.ai_chatbot
+2025-07-13 23:22:02,094 - __main__ - INFO - Loaded cog: cogs.help
+2025-07-13 23:22:02,095 - discord.client - INFO - logging in using static token
+2025-07-13 23:22:03,579 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 091d55e57d5b070e158a439502db2328).
+2025-07-13 23:22:05,664 - __main__ - INFO - Plagg (Kwami of Destruction) has awakened! 🧀
+2025-07-13 23:22:05,665 - __main__ - INFO - Plagg is causing chaos in 2 guilds
+2025-07-13 23:22:06,051 - utils.database - INFO - Database initialization complete
+2025-07-13 23:22:06,051 - __main__ - INFO - Database initialized successfully

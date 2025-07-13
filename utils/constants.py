@@ -1,5 +1,5 @@
 """
-Enhanced Constants for the Epic RPG Bot with Plagg theme
+Enhanced Constants for the Epic RPG Bot with Progressive System
 """
 from typing import Dict, Any, List
 
@@ -8,7 +8,7 @@ RPG_CONSTANTS = {
     # Cooldowns (in seconds)
     'work_cooldown': 3600,      # 1 hour
     'daily_cooldown': 86400,    # 24 hours
-    'adventure_cooldown': 1800,  # 30 minutes
+    'adventure_cooldown': 900,   # 15 minutes (reduced for better progression)
     'battle_cooldown': 300,     # 5 minutes
     'dungeon_cooldown': 7200,   # 2 hours
     'craft_cooldown': 600,      # 10 minutes
@@ -33,6 +33,14 @@ RPG_CONSTANTS = {
     'critical_multiplier': 2.0,  # 2x damage on critical
     'max_party_size': 4,        # Maximum party members
 
+    # Feature unlock levels
+    'class_unlock_level': 5,
+    'pvp_unlock_level': 5,
+    'profession_unlock_level': 10,
+    'dungeon_unlock_level': 15,
+    'faction_unlock_level': 20,
+    'lootbox_unlock_level': 25,
+    'auction_unlock_level': 30,
     # Luck system
     'luck_decay': 0.95,         # Luck decay per day
     'max_luck': 1000,           # Maximum luck points
@@ -43,56 +51,101 @@ RPG_CONSTANTS = {
     'trade_fee': 100,           # Cost to initiate trade
 }
 
-# Player Classes with Plagg theme
+# Player Classes with level-based skill unlocks
 PLAYER_CLASSES = {
     'warrior': {
         'name': 'Cheese Guardian',
-        'description': 'Protects the sacred cheese with sword and shield',
+        'description': 'Tank warrior with high defense and protective abilities',
         'base_stats': {'hp': 120, 'attack': 15, 'defense': 12, 'mana': 50},
         'skills': {
-            'cheese_slam': {'damage': 25, 'mana_cost': 15, 'cooldown': 300},
-            'camembert_shield': {'defense_boost': 10, 'mana_cost': 20, 'cooldown': 600},
-            'gouda_rage': {'attack_boost': 15, 'mana_cost': 25, 'cooldown': 900}
+            'shield_bash': {
+                'damage': 20, 'mana_cost': 15, 'cooldown': 300, 'level_requirement': 5,
+                'description': 'Bash enemies with your shield'
+            },
+            'taunt': {
+                'aggro': True, 'mana_cost': 10, 'cooldown': 180, 'level_requirement': 8,
+                'description': 'Force enemies to target you'
+            },
+            'berserker_rage': {
+                'attack_boost': 25, 'mana_cost': 30, 'cooldown': 600, 'level_requirement': 15,
+                'description': 'Increase attack power temporarily'
+            }
         }
     },
     'mage': {
         'name': 'Kwami Sorcerer',
-        'description': 'Harnesses the power of the Miraculous',
-        'base_stats': {'hp': 80, 'attack': 20, 'defense': 5, 'mana': 100},
+        'description': 'Master of magical arts with powerful spells',
+        'base_stats': {'hp': 80, 'attack': 25, 'defense': 5, 'mana': 100},
         'skills': {
-            'miraculous_blast': {'damage': 35, 'mana_cost': 25, 'cooldown': 300},
-            'plagg_protection': {'shield': 30, 'mana_cost': 30, 'cooldown': 600},
-            'cataclysm': {'damage': 50, 'mana_cost': 50, 'cooldown': 1200}
+            'magic_missile': {
+                'damage': 30, 'mana_cost': 20, 'cooldown': 300, 'level_requirement': 5,
+                'description': 'Launch magical projectiles'
+            },
+            'heal': {
+                'heal': 40, 'mana_cost': 25, 'cooldown': 240, 'level_requirement': 10,
+                'description': 'Restore health with magic'
+            },
+            'fireball': {
+                'damage': 50, 'mana_cost': 40, 'cooldown': 480, 'level_requirement': 15,
+                'description': 'Cast devastating fire magic'
+            }
         }
     },
     'rogue': {
         'name': 'Shadow Cat',
-        'description': 'Strikes from the shadows like a feline predator',
-        'base_stats': {'hp': 90, 'attack': 18, 'defense': 8, 'mana': 70},
+        'description': 'Stealthy assassin with high damage and critical hits',
+        'base_stats': {'hp': 90, 'attack': 22, 'defense': 8, 'mana': 70},
         'skills': {
-            'stealth_strike': {'damage': 30, 'mana_cost': 20, 'cooldown': 300},
-            'cat_reflexes': {'dodge_chance': 0.3, 'mana_cost': 15, 'cooldown': 450},
-            'shadow_clone': {'extra_attack': True, 'mana_cost': 35, 'cooldown': 900}
+            'backstab': {
+                'damage': 35, 'crit_chance': 0.5, 'mana_cost': 20, 'cooldown': 300, 'level_requirement': 5,
+                'description': 'Critical strike from behind'
+            },
+            'stealth': {
+                'invisible': True, 'mana_cost': 25, 'cooldown': 420, 'level_requirement': 12,
+                'description': 'Become invisible temporarily'
+            },
+            'poison_blade': {
+                'damage': 25, 'poison': True, 'mana_cost': 30, 'cooldown': 360, 'level_requirement': 18,
+                'description': 'Apply poison to weapons'
+            }
         }
     },
     'archer': {
         'name': 'Cheese Hunter',
-        'description': 'Masters ranged combat with cheese-tipped arrows',
-        'base_stats': {'hp': 95, 'attack': 17, 'defense': 7, 'mana': 60},
+        'description': 'Ranged specialist with precision and mobility',
+        'base_stats': {'hp': 95, 'attack': 20, 'defense': 7, 'mana': 60},
         'skills': {
-            'cheese_arrow': {'damage': 28, 'mana_cost': 18, 'cooldown': 300},
-            'multi_shot': {'hits': 3, 'mana_cost': 30, 'cooldown': 600},
-            'piercing_shot': {'armor_ignore': True, 'mana_cost': 25, 'cooldown': 450}
+            'aimed_shot': {
+                'damage': 40, 'accuracy': 0.95, 'mana_cost': 18, 'cooldown': 300, 'level_requirement': 5,
+                'description': 'Carefully aimed shot with high accuracy'
+            },
+            'multi_shot': {
+                'hits': 3, 'damage': 15, 'mana_cost': 30, 'cooldown': 480, 'level_requirement': 12,
+                'description': 'Fire multiple arrows'
+            },
+            'explosive_arrow': {
+                'damage': 60, 'area_damage': True, 'mana_cost': 45, 'cooldown': 600, 'level_requirement': 20,
+                'description': 'Arrow that explodes on impact'
+            }
         }
     },
     'healer': {
         'name': 'Tikki Disciple',
-        'description': 'Channels creation energy to heal and support',
+        'description': 'Support specialist focused on healing and buffs',
         'base_stats': {'hp': 85, 'attack': 12, 'defense': 10, 'mana': 120},
         'skills': {
-            'healing_light': {'heal': 40, 'mana_cost': 25, 'cooldown': 300},
-            'blessing': {'stat_boost': 10, 'mana_cost': 30, 'cooldown': 600},
-            'resurrection': {'revive': True, 'mana_cost': 80, 'cooldown': 1800}
+            'heal': {
+                'heal': 50, 'mana_cost': 20, 'cooldown': 180, 'level_requirement': 5,
+                'description': 'Restore ally health'
+            },
+            'group_heal': {
+                'heal': 30, 'targets': 'all', 'mana_cost': 40, 'cooldown': 360, 'level_requirement': 15,
+                'description': 'Heal all party members'
+            },
+            'divine_protection': {
+                'shield': True, 'mana_cost': 35, 'cooldown': 480, 'level_requirement': 20,
+                'description': 'Grant magical protection'
+            }
         }
     },
     'chrono_weave': {
@@ -251,250 +304,265 @@ WORLD_EVENTS = {
     }
 }
 
-# PvP Arenas with Cheese Theme
-PVP_ARENAS = {
-    'cheese_pit': {
-        'name': 'The Cheese Pit',
-        'description': 'Battle in a pit filled with molten cheese',
-        'entry_fee': 100,
-        'winner_multiplier': 1.8,
-        'special_effects': ['cheese_slick', 'heat_damage']
+# Shop Items with level requirements and progressive pricing
+SHOP_ITEMS = {
+    # Beginner Gear (Level 1-5)
+    "weapon_001": {
+        "id": "weapon_001",
+        "name": "Training Sword",
+        "attack": 3,
+        "defense": 1,
+        "price": 50,
+        "level_requirement": 1,
+        "rarity": "common",
+        "category": "weapons",
+        "description": "A practice sword for beginners"
     },
-    'miraculous_arena': {
-        'name': 'Miraculous Colosseum',
-        'description': 'The grand arena where heroes prove their worth',
-        'entry_fee': 500,
-        'winner_multiplier': 2.5,
-        'special_effects': ['power_boost', 'audience_buff']
+    "weapon_002": {
+        "id": "weapon_002",
+        "name": "Iron Sword",
+        "attack": 8,
+        "defense": 2,
+        "price": 150,
+        "level_requirement": 3,
+        "rarity": "common",
+        "category": "weapons",
+        "description": "A basic iron sword"
     },
-    'kwami_realm': {
-        'name': 'Kwami Dimension',
-        'description': 'Fight in the ethereal realm of the kwamis',
-        'entry_fee': 1000,
-        'winner_multiplier': 3.0,
-        'special_effects': ['gravity_shift', 'magic_amplification']
+    "armor_001": {
+        "id": "armor_001",
+        "name": "Cloth Armor",
+        "defense": 4,
+        "price": 80,
+        "level_requirement": 1,
+        "rarity": "common",
+        "category": "armor",
+        "description": "Simple cloth protection"
+    },
+    "armor_002": {
+        "id": "armor_002",
+        "name": "Leather Armor",
+        "defense": 8,
+        "price": 200,
+        "level_requirement": 3,
+        "rarity": "common",
+        "category": "armor",
+        "description": "Basic leather protection"
+    },
+
+    # Combat Supplies (Level 5+)
+    "item_001": {
+        "id": "item_001",
+        "name": "Health Potion",
+        "effect": "heal_50",
+        "price": 30,
+        "level_requirement": 1,
+        "rarity": "common",
+        "category": "consumables",
+        "description": "Restores 50 HP"
+    },
+    "item_002": {
+        "id": "item_002",
+        "name": "Mana Potion",
+        "effect": "mana_50",
+        "price": 40,
+        "level_requirement": 5,
+        "rarity": "common",
+        "category": "consumables",
+        "description": "Restores 50 MP"
+    },
+    "item_003": {
+        "id": "item_003",
+        "name": "Energy Drink",
+        "effect": "restore_energy",
+        "price": 100,
+        "level_requirement": 5,
+        "rarity": "uncommon",
+        "category": "consumables",
+        "description": "Restores battle energy"
+    },
+
+    # Advanced Gear (Level 10+)
+    "weapon_003": {
+        "id": "weapon_003",
+        "name": "Steel Sword",
+        "attack": 15,
+        "defense": 3,
+        "price": 500,
+        "level_requirement": 10,
+        "rarity": "uncommon",
+        "category": "weapons",
+        "description": "A well-forged steel blade"
+    },
+    "weapon_004": {
+        "id": "weapon_004",
+        "name": "Enchanted Blade",
+        "attack": 22,
+        "defense": 5,
+        "price": 1200,
+        "level_requirement": 15,
+        "rarity": "rare",
+        "category": "weapons",
+        "description": "A blade infused with magic"
+    },
+    "armor_003": {
+        "id": "armor_003",
+        "name": "Chain Mail",
+        "defense": 15,
+        "price": 600,
+        "level_requirement": 10,
+        "rarity": "uncommon",
+        "category": "armor",
+        "description": "Interlocked metal rings"
+    },
+    "armor_004": {
+        "id": "armor_004",
+        "name": "Plate Armor",
+        "defense": 25,
+        "price": 1500,
+        "level_requirement": 15,
+        "rarity": "rare",
+        "category": "armor",
+        "description": "Heavy protective plates"
+    },
+
+    # Class-Specific Gear (Level 15+)
+    "weapon_005": {
+        "id": "weapon_005",
+        "name": "Guardian's Shield",
+        "attack": 18,
+        "defense": 20,
+        "price": 2000,
+        "level_requirement": 15,
+        "class_req": "warrior",
+        "rarity": "epic",
+        "category": "weapons",
+        "description": "A warrior's protective weapon"
+    },
+    "weapon_006": {
+        "id": "weapon_006",
+        "name": "Sorcerer's Staff",
+        "attack": 30,
+        "mana_boost": 30,
+        "price": 2200,
+        "level_requirement": 15,
+        "class_req": "mage",
+        "rarity": "epic",
+        "category": "weapons",
+        "description": "Amplifies magical power"
+    },
+    "weapon_007": {
+        "id": "weapon_007",
+        "name": "Shadow Daggers",
+        "attack": 35,
+        "crit_chance": 15,
+        "price": 2500,
+        "level_requirement": 15,
+        "class_req": "rogue",
+        "rarity": "epic",
+        "category": "weapons",
+        "description": "Twin blades for assassins"
+    },
+
+    # Rare Items (Level 25+)
+    "item_007": {
+        "id": "item_007",
+        "name": "Lootbox",
+        "effect": "random_reward",
+        "price": 1000,
+        "level_requirement": 25,
+        "rarity": "rare",
+        "category": "consumables",
+        "description": "Contains random rewards"
+    },
+    "item_008": {
+        "id": "item_008",
+        "name": "Lucky Charm",
+        "effect": "luck_boost",
+        "price": 800,
+        "level_requirement": 20,
+        "rarity": "rare",
+        "category": "consumables",
+        "description": "Increases luck temporarily"
+    },
+
+    # Legendary Items (Level 40+)
+    "weapon_008": {
+        "id": "weapon_008",
+        "name": "Dragon Slayer",
+        "attack": 50,
+        "defense": 15,
+        "price": 10000,
+        "level_requirement": 40,
+        "rarity": "legendary",
+        "category": "weapons",
+        "description": "Forged to slay dragons"
+    },
+    "armor_005": {
+        "id": "armor_005",
+        "name": "Celestial Robes",
+        "defense": 40,
+        "mana_boost": 50,
+        "price": 12000,
+        "level_requirement": 40,
+        "rarity": "legendary",
+        "category": "armor",
+        "description": "Blessed by celestial beings"
+    },
+    "weapon_006": {
+        "id": "weapon_006",
+        "name": "The Last Echo",
+        "attack": 50,
+        "defense": 25,
+        "price": 15000,
+        "rarity": "mythical",
+        "category": "weapons",
+        "description": "Great Axe that echoes with the power of fallen heroes",
+        "effect": "+25% XP gain, +30% boss damage"
+    },
+    "weapon_007": {
+        "id": "weapon_007",
+        "name": "Chrono Weave",
+        "attack": 45,
+        "defense": 20,
+        "price": 12000,
+        "rarity": "mythical",
+        "category": "weapons",
+        "description": "A weapon that weaves through time itself",
+        "effect": "Time manipulation abilities"
+    },
+    "weapon_008": {
+        "id": "weapon_008",
+        "name": "The Paradox Core",
+        "attack": 60,
+        "defense": 30,
+        "price": 25000,
+        "rarity": "mythical",
+        "category": "weapons",
+        "description": "Crystal Staff containing the essence of paradox",
+        "effect": "Reality manipulation powers"
+    },
+    "armor_005": {
+        "id": "armor_005",
+        "name": "Celestial Robes",
+        "defense": 25,
+        "price": 4000,
+        "rarity": "legendary",
+        "category": "armor",
+        "description": "Robes blessed by celestial beings"
+    },
+    "item_007": {
+        "id": "item_007",
+        "name": "Lootbox",
+        "effect": "random_reward",
+        "price": 1000,
+        "rarity": "rare",
+        "category": "consumables",
+        "description": "Contains random rewards including rare items"
     }
 }
 
-# Legacy System
-LEGACY_MODIFIERS = {
-    'blessed_by_cheese': {
-        'name': 'Blessed by Cheese',
-        'description': 'Plagg smiles upon you',
-        'effects': {'xp_bonus': 0.1, 'luck_bonus': 50},
-        'rarity': 'rare'
-    },
-    'descendant_of_heroes': {
-        'name': 'Descendant of Heroes',
-        'description': 'Hero blood flows through your veins',
-        'effects': {'stat_bonus': 5, 'skill_cooldown_reduction': 0.1},
-        'rarity': 'epic'
-    },
-    'kwami_chosen': {
-        'name': 'Chosen by Kwami',
-        'description': 'A kwami has chosen you as their champion',
-        'effects': {'mana_bonus': 50, 'special_abilities': True},
-        'rarity': 'legendary'
-    }
-}
-
-# Achievements
-ACHIEVEMENTS = {
-    'cheese_lover': {
-        'name': 'Cheese Connoisseur',
-        'description': 'Consume 100 cheese items',
-        'requirement': {'cheese_consumed': 100},
-        'rewards': {'title': 'Cheese Master', 'luck_points': 100}
-    },
-    'dragon_slayer': {
-        'name': 'Dragon Slayer',
-        'description': 'Defeat 10 Dragon Lords',
-        'requirement': {'dragons_defeated': 10},
-        'rewards': {'title': 'Dragon Bane', 'legendary_weapon': 1}
-    },
-    'kwami_friend': {
-        'name': 'Friend of Kwamis',
-        'description': 'Complete 50 kwami-related quests',
-        'requirement': {'kwami_quests': 50},
-        'rewards': {'title': 'Kwami Whisperer', 'kwami_companion': 1}
-    }
-}
-
-# Weapon Unlock Conditions
-WEAPON_UNLOCK_CONDITIONS = {
-    "The Last Echo": {
-        "requirements": [
-            {"type": "boss_defeat", "boss": "paradox_realm_boss", "min_level": 100},
-            {"type": "health_condition", "max_hp_percent": 25},
-            {"type": "restriction", "no_buffs": True, "no_potions": True, "no_healing": True},
-            {"type": "quest", "quest_name": "final_trial"}
-        ],
-        "description": "Defeat the Paradox Realm Boss without buffs, potions, or healing while under 25% HP",
-        "unlock_message": "The echoes of eternity resonate within you... The Last Echo has chosen its wielder!"
-    },
-    "The Paradox Core": {
-        "requirements": [
-            {"type": "dungeon_clear", "dungeon": "paradox_chamber", "floors": 10},
-            {"type": "item_required", "item": "paradox_key"},
-            {"type": "battle_condition", "no_status_effects": True}
-        ],
-        "description": "Complete the 10-floor Paradox Chamber and use in battle with no status effects",
-        "unlock_message": "Reality bends to your will... The Paradox Core materializes before you!"
-    },
-    "Timekeeper's Edge": {
-        "requirements": [
-            {"type": "class_unlock", "class": "chrono_weave"},
-            {"type": "boss_defeat", "boss": "time_rift_dragon", "player_level_max": 30, "boss_level_min": 80}
-        ],
-        "description": "Unlock Chrono Weave class and defeat Time Rift Dragon at level 30 or lower",
-        "unlock_message": "Time itself acknowledges your mastery... The Timekeeper's Edge appears!"
-    },
-    "Chrono Tap": {
-        "requirements": [
-            {"type": "class_unlock", "class": "chrono_weave"},
-            {"type": "temporal_achievement", "achievement": "master_of_time"}
-        ],
-        "description": "Master temporal magic as Chrono Weave class",
-        "unlock_message": "Your mastery of time resonates... The Chrono Tap manifests!"
-    },
-    "Echo of Eternity": {
-        "requirements": [
-            {"type": "class_unlock", "class": "chrono_weave"},
-            {"type": "special_condition", "condition": "survive_paradox_storm"}
-        ],
-        "description": "Survive the Paradox Storm event as Chrono Weave",
-        "unlock_message": "Eternal echoes shield your soul... The Echo of Eternity forms!"
-    }
-}
-
-# Special Bosses and Events
-SPECIAL_BOSSES = {
-    "time_rift_dragon": {
-        "name": "Time Rift Dragon",
-        "level": 80,
-        "hp": 5000,
-        "attack": 100,
-        "defense": 50,
-        "special_abilities": ["temporal_breath", "time_freeze", "chronos_roar"],
-        "drops": ["chrono_fragment", "dragon_scale", "time_essence"],
-        "location": "temporal_rift"
-    },
-    "paradox_realm_boss": {
-        "name": "Void Sovereign",
-        "level": 100,
-        "hp": 10000,
-        "attack": 150,
-        "defense": 75,
-        "special_abilities": ["reality_tear", "void_pulse", "paradox_storm"],
-        "drops": ["The Last Echo", "void_crystal", "sovereign_crown"],
-        "location": "paradox_realm"
-    },
-    "camembert_colossus": {
-        "name": "Camembert Colossus",
-        "level": 75,
-        "hp": 15000,
-        "attack": 120,
-        "defense": 100,
-        "special_abilities": ["cheese_avalanche", "dairy_rage", "calcium_shield"],
-        "drops": ["legendary_cheese_armor", "colossus_medal", "ancient_camembert"],
-        "location": "cheese_dimension",
-        "event_boss": True,
-        "min_players": 10
-    }
-}
-
-# Special Dungeons
-SPECIAL_DUNGEONS = {
-    "paradox_chamber": {
-        "name": "Paradox Chamber",
-        "floors": 10,
-        "difficulty": "mythic",
-        "mechanics": ["time_puzzles", "reality_shifts", "temporal_traps"],
-        "rewards": ["The Paradox Core", "paradox_fragments", "time_crystals"],
-        "unlock_requirement": "paradox_key"
-    },
-    "temporal_rift": {
-        "name": "Temporal Rift",
-        "floors": 5,
-        "difficulty": "legendary",
-        "mechanics": ["time_dilation", "past_echoes", "future_visions"],
-        "rewards": ["chrono_fragments", "time_essence", "temporal_gear"],
-        "event_dungeon": True
-    }
-}
-
-# Ancient Relics for Chrono Weave Unlock
-ANCIENT_RELICS = {
-    "relic_of_past": {
-        "name": "Relic of the Past",
-        "description": "Echoes with memories of what was",
-        "location": "ancient_ruins",
-        "drop_chance": 0.05,
-        "requirement": "archaeology_quest"
-    },
-    "relic_of_future": {
-        "name": "Relic of the Future",
-        "description": "Pulses with energy of what will be",
-        "location": "crystal_caverns",
-        "drop_chance": 0.05,
-        "requirement": "prophecy_quest"
-    },
-    "relic_of_present": {
-        "name": "Relic of the Present",
-        "description": "Hums with the power of now",
-        "location": "temporal_nexus",
-        "drop_chance": 0.05,
-        "requirement": "meditation_quest"
-    }
-}
-
-# Seasonal Changes
-SEASONS = {
-    'spring': {
-        'name': 'Season of Growth',
-        'effects': {'gathering_bonus': 1.2, 'new_monsters': ['flower_sprite', 'garden_golem']},
-        'special_events': ['bloom_festival']
-    },
-    'summer': {
-        'name': 'Season of Power',
-        'effects': {'xp_bonus': 1.15, 'combat_intensity': 1.1},
-        'special_events': ['solar_eclipse', 'cheese_melting']
-    },
-    'autumn': {
-        'name': 'Season of Harvest',
-        'effects': {'crafting_bonus': 1.3, 'rare_material_chance': 1.2},
-        'special_events': ['harvest_moon', 'cheese_aging']
-    },
-    'winter': {
-        'name': 'Season of Trials',
-        'effects': {'boss_strength': 1.2, 'legendary_drop_chance': 1.5},
-        'special_events': ['frost_invasion', 'frozen_cheese']
-    }
-}
-
-# Mini-Games
-MINI_GAMES = {
-    'cheese_fishing': {
-        'name': 'Cheese Pond Fishing',
-        'description': 'Fish in magical cheese ponds for rare aquatic pets',
-        'cost': 50,
-        'rewards': ['cheese_fish', 'aquatic_pet', 'fishing_rod']
-    },
-    'plagg_trivia': {
-        'name': "Plagg's Cheese Trivia",
-        'description': 'Test your knowledge of cheese and kwamis',
-        'cost': 25,
-        'rewards': ['trivia_trophy', 'wisdom_boost', 'cheese_knowledge']
-    },
-    'miraculous_roulette': {
-        'name': 'Miraculous Roulette',
-        'description': 'Spin the wheel of fortune for miraculous prizes',
-        'cost': 100,
-        'rewards': ['coins', 'items', 'miraculous_fragments']
-    }
-}
-
-# Item Rarity System
+# Rarity System
 RARITY_COLORS = {
     "common": 0x9E9E9E,      # Gray
     "uncommon": 0x4CAF50,    # Green
@@ -527,169 +595,39 @@ LUCK_LEVELS = {
     'divine': {'min': 1000, 'max': 9999, 'emoji': '🌟', 'bonus_percent': 50}
 }
 
-# Weapons System
+# Weapons organized by class and rarity
 WEAPONS = {
-    # Warrior Class Weapons
+    # Warrior Weapons
     "Iron Petal": {
-        "attack": 10,
-        "defense": 2,
-        "rarity": "common",
-        "class_req": "warrior",
-        "special": "boss_damage",
-        "boss_damage": 5
-    },
-    "Stump Cleave": {
-        "attack": 15,
-        "defense": 5,
-        "rarity": "common",
-        "class_req": "warrior",
-        "special": "crit_chance",
-        "crit_chance": 3
-    },
-    "Wooden Round": {
-        "attack": 2,
-        "defense": 15,
-        "rarity": "common",
-        "class_req": "warrior",
-        "special": "block_chance",
-        "block_chance": 10
-    },
-
-    # Mage Class Weapons
-    "Sprintling": {
-        "attack": 10,
-        "defense": 1,
-        "rarity": "uncommon",
-        "class_req": "mage",
-        "special": "mana_regen",
-        "mana_regen": 5
-    },
-    "Ashen Quill": {
         "attack": 12,
-        "defense": 3,
-        "rarity": "uncommon",
-        "class_req": "mage",
-        "special": "spell_power",
-        "spell_power": 10
-    },
-    "The Tome of Flare": {
-        "attack": 8,
-        "defense": 2,
-        "rarity": "uncommon",
-        "class_req": "mage",
-        "special": "fireball_chance",
-        "fireball_chance": 3
-    },
-
-    # Rogue Class Weapons
-    "Shiny Slicer": {
-        "attack": 18,
-        "defense": 3,
-        "rarity": "rare",
-        "class_req": "rogue",
-        "special": "crit_chance",
-        "crit_chance": 10
-    },
-    "Whispering Curve": {
-        "attack": 20,
-        "defense": 2,
-        "rarity": "rare",
-        "class_req": "rogue",
-        "special": "ranged_damage",
-        "ranged_damage": 7
-    },
-    "Stinger Vial": {
-        "attack": 5,
-        "defense": 0,
-        "rarity": "rare",
-        "class_req": "rogue",
-        "special": "stun_chance",
-        "stun_chance": 10
-    },
-
-    # Archer Class Weapons
-    "Sylvan Edge": {
-        "attack": 25,
         "defense": 4,
-        "rarity": "epic",
-        "class_req": "archer",
-        "special": "airborne_damage",
-        "airborne_damage": 15
+        "rarity": "common",
+        "class_req": "warrior",
+        "level_requirement": 5
     },
-    "Thunderpop": {
-        "attack": 30,
-        "defense": 3,
-        "rarity": "epic",
-        "class_req": "archer",
-        "special": "crit_chance",
-        "crit_chance": 20
-    },
-    "Ethereal Tip": {
-        "attack": 5,
-        "defense": 0,
-        "rarity": "epic",
-        "class_req": "archer",
-        "special": "speed_reduction",
-        "speed_reduction": 5
-    },
-
-    # Healer Class Weapons
-    "Elder's Pulse": {
-        "attack": 15,
-        "defense": 7,
-        "rarity": "legendary",
-        "class_req": "healer",
-        "special": "healing_power",
-        "healing_power": 20
-    },
-    "Nectar of Lifespan": {
-        "attack": 0,
-        "defense": 0,
-        "rarity": "legendary",
-        "class_req": "healer",
-        "special": "instant_heal",
-        "instant_heal": 200,
-        "uses": 1
-    },
-    "Eternal Glow": {
-        "attack": 10,
-        "defense": 5,
-        "rarity": "legendary",
-        "class_req": "healer",
-        "special": "multi_bonus",
-        "mana_regen": 10,
-        "crit_heal": 5
-    },
-
-    # Chrono Weave (Hidden Class) Weapons
-    "Timekeeper's Edge": {
-        "attack": 35,
-        "defense": 5,
-        "rarity": "legendary",
-        "class_req": "chrono_weave",
-        "special": "time_reversal",
-        "time_reversal_charges": 1,
-        "cooldown": 259200  # 3 days in seconds
-    },
-    "Chrono Tap": {
+    "Guardian's Might": {
         "attack": 25,
-        "defense": 3,
-        "rarity": "legendary",
-        "class_req": "chrono_weave",
-        "special": "temporal_surge",
-        "crit_chance": 20,
-        "xp_gain": 10
-    },
-    "Echo of Eternity": {
-        "attack": 8,
-        "defense": 25,
-        "rarity": "legendary",
-        "class_req": "chrono_weave",
-        "special": "chrono_immunity",
-        "debuff_resist": 100
+        "defense": 15,
+        "rarity": "epic",
+        "class_req": "warrior",
+        "level_requirement": 20
     },
 
-    # Mythic Weapons
+    # Mage Weapons
+    "Apprentice Wand": {
+        "attack": 15,
+        "mana_boost": 20,
+        "rarity": "common",
+        "class_req": "mage",
+        "level_requirement": 5
+    },
+    "Archmage Staff": {
+        "attack": 35,
+        "mana_boost": 50,
+        "rarity": "legendary",
+        "class_req": "mage",
+        "level_requirement": 30
+    },
     "The Last Echo": {
         "attack": 50,
         "defense": 10,
@@ -711,19 +649,26 @@ WEAPONS = {
         "unlock_condition": "paradox_chamber"
     },
 
-    # Omnipotent Weapons (existing)
-    "World Ender": {
-        "attack": 999999,
-        "defense": 0,
-        "rarity": "omnipotent",
-        "class_req": "any",
-        "special": "one_shot_kill"
-    }
+    # Add more weapons as needed...
 }
 
-# Armor System
+# Armor with level requirements
 ARMOR = {
-    # Common Armor
+    "Leather Vest": {
+        "defense": 8,
+        "rarity": "common",
+        "level_requirement": 1
+    },
+    "Iron Chestplate": {
+        "defense": 18,
+        "rarity": "uncommon",
+        "level_requirement": 8
+    },
+    "Dragon Scale Armor": {
+        "defense": 40,
+        "rarity": "legendary",
+        "level_requirement": 35
+    },
     "Leather Vest": {
         "defense": 8,
         "rarity": "common",
@@ -766,8 +711,14 @@ ARMOR = {
     }
 }
 
-# Omnipotent Items
+# Omnipotent Items (existing)
 OMNIPOTENT_ITEM = {
+    "Reality Stone": {
+        "rarity": "omnipotent",
+        "special": "wish_any_item",
+        "description": "Can grant any item except World Ender",
+        "level_requirement": 50
+    },
     "Reality Stone": {
         "rarity": "omnipotent",
         "special": "wish_any_item",
@@ -775,237 +726,153 @@ OMNIPOTENT_ITEM = {
     }
 }
 
-# Shop Items - Unique ID-based system to prevent duplication
-SHOP_ITEMS = {
-    "weapon_001": {
-        "id": "weapon_001",
-        "name": "Iron Sword",
-        "attack": 5,
-        "defense": 2,
-        "price": 100,
-        "rarity": "common",
-        "category": "weapons",
-        "description": "A basic iron sword for beginners"
+# Adventure locations with level gates
+ADVENTURE_LOCATIONS = {
+    'training': {
+        'name': 'Training Grounds',
+        'level_requirement': 1,
+        'description': 'Safe practice area for beginners',
+        'rewards': {'coins': (10, 30), 'xp': (5, 15)}
     },
-    "weapon_002": {
-        "id": "weapon_002",
-        "name": "Steel Sword",
-        "attack": 8,
-        "defense": 3,
-        "price": 200,
-        "rarity": "uncommon",
-        "category": "weapons",
-        "description": "A sturdy steel blade"
+    'forest': {
+        'name': 'Peaceful Forest',
+        'level_requirement': 3,
+        'description': 'Woods with small creatures',
+        'rewards': {'coins': (30, 70), 'xp': (15, 35)}
     },
-    "weapon_003": {
-        "id": "weapon_003",
-        "name": "Mystic Blade",
-        "attack": 12,
-        "defense": 5,
-        "price": 500,
-        "rarity": "rare",
-        "category": "weapons",
-        "description": "A blade infused with magical energy"
+    'mountains': {
+        'name': 'Dangerous Mountains',
+        'level_requirement': 8,
+        'description': 'Treacherous peaks',
+        'rewards': {'coins': (60, 120), 'xp': (30, 60)}
     },
-    "weapon_004": {
-        "id": "weapon_004",
-        "name": "Dragon Slayer",
-        "attack": 20,
-        "defense": 8,
-        "price": 1500,
-        "rarity": "epic",
-        "category": "weapons",
-        "description": "Forged to slay the mightiest dragons"
+    'dungeon': {
+        'name': 'Ancient Dungeon',
+        'level_requirement': 15,
+        'description': 'Dark underground chambers',
+        'rewards': {'coins': (100, 200), 'xp': (50, 100)}
     },
-    "weapon_005": {
-        "id": "weapon_005",
-        "name": "Timekeeper's Edge",
-        "attack": 35,
-        "defense": 15,
-        "price": 5000,
-        "rarity": "legendary",
-        "category": "weapons",
-        "description": "Twin-blade sword with time manipulation powers",
-        "effect": "Time Reversal (1 charge/3 days, reverses 5 turns)"
+    'dragon_lair': {
+        'name': 'Dragon Lair',
+        'level_requirement': 25,
+        'description': 'Legendary dragon domain',
+        'rewards': {'coins': (200, 500), 'xp': (100, 250)}
     },
-    "weapon_006": {
-        "id": "weapon_006",
-        "name": "The Last Echo",
-        "attack": 50,
-        "defense": 25,
-        "price": 15000,
-        "rarity": "mythical",
-        "category": "weapons",
-        "description": "Great Axe that echoes with the power of fallen heroes",
-        "effect": "+25% XP gain, +30% boss damage"
+    'paris_streets': {
+        'name': 'Streets of Paris',
+        'description': 'The familiar streets where miraculous holders patrol',
+        'level_range': (1, 10),
+        'monsters': ['akuma_victim', 'sentimonster'],
+        'resources': ['city_materials', 'tourist_coins']
     },
-    "weapon_007": {
-        "id": "weapon_007",
-        "name": "Chrono Weave",
-        "attack": 45,
-        "defense": 20,
-        "price": 12000,
-        "rarity": "mythical",
-        "category": "weapons",
-        "description": "A weapon that weaves through time itself",
-        "effect": "Time manipulation abilities"
+    'cheese_dimension': {
+        'name': 'Plagg\'s Cheese Dimension',
+        'description': 'A realm made entirely of different cheeses',
+        'level_range': (15, 30),
+        'monsters': ['cheese_golem', 'cheddar_spirit'],
+        'resources': ['aged_cheese', 'mystical_dairy']
     },
-    "weapon_008": {
-        "id": "weapon_008",
-        "name": "The Paradox Core",
-        "attack": 60,
-        "defense": 30,
-        "price": 25000,
-        "rarity": "mythical",
-        "category": "weapons",
-        "description": "Crystal Staff containing the essence of paradox",
-        "effect": "Reality manipulation powers"
-    },
-    "armor_001": {
-        "id": "armor_001",
-        "name": "Leather Armor",
-        "defense": 3,
-        "price": 80,
-        "rarity": "common",
-        "category": "armor",
-        "description": "Basic leather protection"
-    },
-    "armor_002": {
-        "id": "armor_002",
-        "name": "Chain Mail",
-        "defense": 6,
-        "price": 180,
-        "rarity": "uncommon",
-        "category": "armor",
-        "description": "Interlocked metal rings for protection"
-    },
-    "armor_003": {
-        "id": "armor_003",
-        "name": "Plate Armor",
-        "defense": 10,
-        "price": 400,
-        "rarity": "rare",
-        "category": "armor",
-        "description": "Heavy metal plates for maximum protection"
-    },
-    "armor_004": {
-        "id": "armor_004",
-        "name": "Dragon Scale Armor",
-        "defense": 18,
-        "price": 1200,
-        "rarity": "epic",
-        "category": "armor",
-        "description": "Armor crafted from ancient dragon scales"
-    },
-    "armor_005": {
-        "id": "armor_005",
-        "name": "Celestial Robes",
-        "defense": 25,
-        "price": 4000,
-        "rarity": "legendary",
-        "category": "armor",
-        "description": "Robes blessed by celestial beings"
-    },
-    "item_001": {
-        "id": "item_001",
-        "name": "Health Potion",
-        "effect": "heal_50",
-        "price": 25,
-        "rarity": "common",
-        "category": "consumables",
-        "description": "Restores 50 HP"
-    },
-    "item_002": {
-        "id": "item_002",
-        "name": "Mana Potion",
-        "effect": "mana_50",
-        "price": 30,
-        "rarity": "common",
-        "category": "consumables",
-        "description": "Restores 50 MP"
-    },
-    "item_003": {
-        "id": "item_003",
-        "name": "Lucky Charm",
-        "effect": "luck_boost",
-        "price": 150,
-        "rarity": "uncommon",
-        "category": "consumables",
-        "description": "Increases luck for a short time"
-    },
-    "item_004": {
-        "id": "item_004",
-        "name": "XP Boost",
-        "effect": "xp_double",
-        "price": 200,
-        "rarity": "rare",
-        "category": "consumables",
-        "description": "Doubles XP gain for next battle"
-    },
-    "item_005": {
-        "id": "item_005",
-        "name": "Phoenix Feather",
-        "effect": "revive",
-        "price": 800,
-        "rarity": "epic",
-        "category": "consumables",
-        "description": "Revives from death once"
-    },
-    "item_006": {
-        "id": "item_006",
-        "name": "Golden Elixir",
-        "effect": "heal_500",
-        "price": 1500,
-        "rarity": "legendary",
-        "category": "consumables",
-        "description": "Restores 500 HP instantly"
-    },
-    "item_007": {
-        "id": "item_007",
-        "name": "Lootbox",
-        "effect": "random_reward",
-        "price": 1000,
-        "rarity": "rare",
-        "category": "consumables",
-        "description": "Contains random rewards including rare items"
+    'kwami_realm': {
+        'name': 'The Kwami Realm',
+        'description': 'The mystical home dimension of all kwamis',
+        'level_range': (25, 50),
+        'monsters': ['rogue_kwami', 'guardian_spirit'],
+        'resources': ['kwami_essence', 'miraculous_energy']
     }
 }
 
-# Rarity display configuration
-RARITY_DISPLAY = {
-    "common": {"emoji": "⚪", "color": 0x95A5A6},
-    "uncommon": {"emoji": "🟢", "color": 0x2ECC71},
-    "rare": {"emoji": "🔵", "color": 0x3498DB},
-    "epic": {"emoji": "🟣", "color": 0x9B59B6},
-    "legendary": {"emoji": "🟠", "color": 0xF39C12},
-    "mythical": {"emoji": "🔴", "color": 0xE74C3C}
+# PvP Arenas with level requirements
+PVP_ARENAS = {
+    'training_ground': {
+        'name': 'Training Ground',
+        'description': 'Safe practice arena for beginners',
+        'entry_fee': 0,
+        'level_requirement': 5,
+        'winner_multiplier': 1.2,
+        'special_effects': []
+    },
+    'colosseum': {
+        'name': 'Colosseum',
+        'description': 'Classic gladiator arena',
+        'entry_fee': 100,
+        'level_requirement': 10,
+        'winner_multiplier': 1.8,
+        'special_effects': ['crowd_boost']
+    },
+    'dragon_pit': {
+        'name': 'Dragon Pit',
+        'description': 'Dangerous arena with fire hazards',
+        'entry_fee': 500,
+        'level_requirement': 20,
+        'winner_multiplier': 2.5,
+        'special_effects': ['fire_damage', 'dragon_roar']
+    },
+    'cheese_pit': {
+        'name': 'The Cheese Pit',
+        'description': 'Battle in a pit filled with molten cheese',
+        'entry_fee': 100,
+        'winner_multiplier': 1.8,
+        'special_effects': ['cheese_slick', 'heat_damage'],
+        'map_effects': {
+            'cheese_slick': 'Random chance to slip and lose turn',
+            'heat_damage': 'Gradual HP loss over time'
+        }
+    },
+    'miraculous_arena': {
+        'name': 'Miraculous Colosseum',
+        'description': 'The grand arena where heroes prove their worth',
+        'entry_fee': 500,
+        'winner_multiplier': 2.5,
+        'special_effects': ['power_boost', 'audience_buff'],
+        'map_effects': {
+            'power_boost': 'All attacks deal 25% more damage',
+            'audience_buff': 'Gain energy faster from crowd cheers'
+        }
+    },
+    'kwami_realm': {
+        'name': 'Kwami Dimension',
+        'description': 'Fight in the ethereal realm of the kwamis',
+        'entry_fee': 1000,
+        'winner_multiplier': 3.0,
+        'special_effects': ['gravity_shift', 'magic_amplification'],
+        'map_effects': {
+            'gravity_shift': 'Movement abilities have different effects',
+            'magic_amplification': 'Special attacks cost less energy'
+        }
+    },
+    'shadow_realm': {
+        'name': 'Shadow Realm',
+        'description': 'A dark dimension where only the strongest survive',
+        'entry_fee': 2000,
+        'winner_multiplier': 4.0,
+        'special_effects': ['shadow_clones', 'darkness_boost'],
+        'map_effects': {
+            'shadow_clones': 'Attacks may hit shadow copies',
+            'darkness_boost': 'Stealth attacks more effective'
+        }
+    }
 }
 
 def get_all_shop_items():
-    """Get all shop items with deduplication by ID"""
-    all_items = {}
+    """Get all shop items organized by level"""
+    return SHOP_ITEMS
 
-    for item_id, item_data in SHOP_ITEMS.items():
-        if item_id and item_data not in all_items:
-            all_items[item_id] = {
-                **item_data,
-            }
+def get_items_by_level(min_level: int, max_level: int = 999):
+    """Get items available for a level range"""
+    return {
+        item_id: item_data
+        for item_id, item_data in SHOP_ITEMS.items()
+        if min_level <= item_data.get('level_requirement', 1) <= max_level
+    }
 
-    return all_items
-
-def get_items_by_rarity(rarity_filter=None):
-    """Get items filtered by rarity with no duplicates"""
-    all_items = get_all_shop_items()
-
-    if not rarity_filter:
-        return all_items
-
+def get_items_by_rarity(rarity_filter):
+    """Get items by rarity"""
     if isinstance(rarity_filter, str):
         rarity_filter = [rarity_filter]
 
     return {
         item_id: item_data
-        for item_id, item_data in all_items.items()
+        for item_id, item_data in SHOP_ITEMS.items()
         if item_data.get("rarity") in rarity_filter
     }
 
@@ -1047,5 +914,373 @@ WORLD_LOCATIONS = {
         'level_range': (25, 50),
         'monsters': ['rogue_kwami', 'guardian_spirit'],
         'resources': ['kwami_essence', 'miraculous_energy']
+    }
+}
+
+# Enhanced Battle System
+BATTLE_MECHANICS = {
+    'energy_system': {
+        'max_energy': 100,
+        'energy_regen': 25,
+        'action_costs': {
+            'attack': 20,
+            'defend': 15,
+            'special': 40,
+            'item': 0
+        }
+    },
+    'status_effects': {
+        'stunned': {'duration': 1, 'effect': 'skip_turn'},
+        'defense_boost': {'duration': 1, 'effect': 'reduce_damage_50'},
+        'poison': {'duration': 3, 'effect': 'damage_over_time'},
+        'regen': {'duration': 3, 'effect': 'heal_over_time'},
+        'berserk': {'duration': 2, 'effect': 'double_damage'}
+    },
+    'critical_hit': {
+        'base_chance': 0.15,
+        'damage_multiplier': 1.5
+    }
+}
+
+# New Monsters with Enhanced AI
+ENHANCED_MONSTERS = {
+    'Slime': {
+        'hp': 60,
+        'attack': 8,
+        'defense': 3,
+        'special_abilities': ['regeneration'],
+        'ai_behavior': 'defensive',
+        'rewards': {'coins': (20, 40), 'xp': (10, 20)}
+    },
+    'Goblin_Warrior': {
+        'hp': 80,
+        'attack': 12,
+        'defense': 6,
+        'special_abilities': ['weapon_throw', 'battle_cry'],
+        'ai_behavior': 'aggressive',
+        'rewards': {'coins': (30, 60), 'xp': (15, 30)}
+    },
+    'Shadow_Assassin': {
+        'hp': 70,
+        'attack': 18,
+        'defense': 4,
+        'special_abilities': ['stealth_attack', 'poison_blade'],
+        'ai_behavior': 'tactical',
+        'rewards': {'coins': (50, 90), 'xp': (25, 45)}
+    },
+    'Crystal_Golem': {
+        'hp': 150,
+        'attack': 15,
+        'defense': 20,
+        'special_abilities': ['crystal_spike', 'armor_repair'],
+        'ai_behavior': 'tank',
+        'rewards': {'coins': (80, 120), 'xp': (40, 60)}
+    },
+    'Fire_Elemental': {
+        'hp': 90,
+        'attack': 20,
+        'defense': 8,
+        'special_abilities': ['fire_blast', 'burn_aura'],
+        'ai_behavior': 'elemental',
+        'rewards': {'coins': (60, 100), 'xp': (30, 50)}
+    }
+}
+
+# New Items and Equipment
+ENHANCED_WEAPONS = {
+    'Cheese_Blade': {
+        'name': 'Blade of Aged Cheese',
+        'attack': 25,
+        'rarity': 'epic',
+        'special': 'cheese_slice',
+        'description': 'A sword forged from the finest aged cheese, sharp enough to cut through reality.',
+        'price': 5000,
+        'category': 'weapons'
+    },
+    'Miraculous_Staff': {
+        'name': 'Staff of Miracles',
+        'attack': 30,
+        'rarity': 'legendary',
+        'special': 'miracle_cast',
+        'description': 'A staff imbued with the power of all kwamis.',
+        'price': 10000,
+        'category': 'weapons'
+    },
+    'Destruction_Gauntlets': {
+        'name': 'Gauntlets of Destruction',
+        'attack': 35,
+        'rarity': 'mythic',
+        'special': 'cataclysm',
+        'description': 'Gloves that channel the power of destruction itself.',
+        'price': 20000,
+        'category': 'weapons'
+    }
+}
+
+# New Consumables
+ENHANCED_CONSUMABLES = {
+    'Camembert_Deluxe': {
+        'name': 'Deluxe Camembert',
+        'effect': 'full_heal_and_buff',
+        'description': 'Plaggs favorite cheese that fully heals and provides temporary buffs.',
+        'price': 500,
+        'category': 'consumables'
+    },
+    'Kwami_Energy_Drink': {
+        'name': 'Kwami Energy Drink',
+        'effect': 'restore_energy',
+        'description': 'A magical drink that restores all energy.',
+        'price': 300,
+        'category': 'consumables'
+    },
+    'Lucky_Charm_Scroll': {
+        'name': 'Lucky Charm Scroll',
+        'effect': 'summon_lucky_charm',
+        'description': 'Creates a random useful item for the current situation.',
+        'price': 1000,
+        'category': 'consumables'
+    }
+}
+
+# Adventure Locations with Enhanced Mechanics
+ENHANCED_LOCATIONS = {
+    'cheese_caves': {
+        'name': 'Ancient Cheese Caves',
+        'description': 'Deep caves filled with ancient cheese deposits and dangerous creatures.',
+        'difficulty': 'medium',
+        'encounters': {
+            'cheese_golem': 0.3,
+            'cave_spider': 0.25,
+            'treasure_chest': 0.2,
+            'cheese_fountain': 0.15,
+            'secret_passage': 0.1
+        },
+        'environmental_effects': ['low_light', 'cheese_aroma']
+    },
+    'kwami_dimension': {
+        'name': 'Kwami Dimension',
+        'description': 'A mystical realm where kwamis reside.',
+        'difficulty': 'hard',
+        'encounters': {
+            'guardian_kwami': 0.2,
+            'energy_crystal': 0.25,
+            'dimensional_rift': 0.2,
+            'ancient_relic': 0.15,
+            'kwami_blessing': 0.2
+        },
+        'environmental_effects': ['magic_amplification', 'time_dilation']
+    },
+    'paris_rooftops': {
+        'name': 'Paris Rooftops',
+        'description': 'The rooftops of Paris where heroes patrol.',
+        'difficulty': 'easy',
+        'encounters': {
+            'akuma_victim': 0.3,
+            'police_chase': 0.2,
+            'civilian_rescue': 0.25,
+            'hidden_cache': 0.15,
+            'view_point': 0.1
+        },
+        'environmental_effects': ['wind_boost', 'city_lights']
+    }
+}
+
+# Guild System
+GUILD_FEATURES = {
+    'max_members': 20,
+    'ranks': ['Member', 'Elite', 'Officer', 'Leader'],
+    'benefits': {
+        'exp_bonus': 0.1,
+        'coin_bonus': 0.05,
+        'guild_shop': True,
+        'guild_battles': True
+    },
+    'upgrade_costs': {
+        'exp_boost': 10000,
+        'coin_boost': 15000,
+        'member_slots': 5000,
+        'guild_hall': 50000
+    }
+}
+
+# Achievement System
+ACHIEVEMENTS = {
+    'first_steps': {
+        'name': 'First Steps',
+        'description': 'Complete your first adventure',
+        'requirement': {'type': 'adventure_count', 'value': 1},
+        'reward': {'coins': 100, 'xp': 50},
+        'rarity': 'common'
+    },
+    'cheese_lover': {
+        'name': 'Cheese Lover',
+        'description': 'Consume 50 cheese-related items',
+        'requirement': {'type': 'cheese_consumed', 'value': 50},
+        'reward': {'coins': 1000, 'title': 'Cheese Connoisseur'},
+        'rarity': 'uncommon'
+    },
+    'battle_master': {
+        'name': 'Battle Master',
+        'description': 'Win 100 battles',
+        'requirement': {'type': 'battles_won', 'value': 100},
+        'reward': {'coins': 5000, 'weapon': 'Champion_Sword'},
+        'rarity': 'rare'
+    },
+    'kwami_chosen': {
+        'name': 'Chosen by Kwami',
+        'description': 'Reach level 50 with a miraculous equipped',
+        'requirement': {'type': 'level_with_miraculous', 'value': 50},
+        'reward': {'coins': 10000, 'title': 'Kwami Champion', 'special_ability': True},
+        'rarity': 'legendary'
+    }
+}
+
+# Enhanced PvP Arenas
+PVP_ARENAS = {
+    'cheese_pit': {
+        'name': 'The Cheese Pit',
+        'description': 'Battle in a pit filled with molten cheese',
+        'entry_fee': 100,
+        'winner_multiplier': 1.8,
+        'special_effects': ['cheese_slick', 'heat_damage'],
+        'map_effects': {
+            'cheese_slick': 'Random chance to slip and lose turn',
+            'heat_damage': 'Gradual HP loss over time'
+        }
+    },
+    'miraculous_arena': {
+        'name': 'Miraculous Colosseum',
+        'description': 'The grand arena where heroes prove their worth',
+        'entry_fee': 500,
+        'winner_multiplier': 2.5,
+        'special_effects': ['power_boost', 'audience_buff'],
+        'map_effects': {
+            'power_boost': 'All attacks deal 25% more damage',
+            'audience_buff': 'Gain energy faster from crowd cheers'
+        }
+    },
+    'kwami_realm': {
+        'name': 'Kwami Dimension',
+        'description': 'Fight in the ethereal realm of the kwamis',
+        'entry_fee': 1000,
+        'winner_multiplier': 3.0,
+        'special_effects': ['gravity_shift', 'magic_amplification'],
+        'map_effects': {
+            'gravity_shift': 'Movement abilities have different effects',
+            'magic_amplification': 'Special attacks cost less energy'
+        }
+    },
+    'shadow_realm': {
+        'name': 'Shadow Realm',
+        'description': 'A dark dimension where only the strongest survive',
+        'entry_fee': 2000,
+        'winner_multiplier': 4.0,
+        'special_effects': ['shadow_clones', 'darkness_boost'],
+        'map_effects': {
+            'shadow_clones': 'Attacks may hit shadow copies',
+            'darkness_boost': 'Stealth attacks more effective'
+        }
+    }
+}
+
+# Daily Challenges
+DAILY_CHALLENGES = {
+    'monday': {
+        'name': 'Monster Monday',
+        'description': 'Defeat 5 monsters',
+        'requirement': {'type': 'monsters_defeated', 'value': 5},
+        'reward': {'coins': 500, 'xp': 200}
+    },
+    'tuesday': {
+        'name': 'Treasure Tuesday',
+        'description': 'Find 3 treasure chests',
+        'requirement': {'type': 'treasures_found', 'value': 3},
+        'reward': {'coins': 750, 'item': 'random_rare'}
+    },
+    'wednesday': {
+        'name': 'Work Wednesday',
+        'description': 'Complete 10 work sessions',
+        'requirement': {'type': 'work_completed', 'value': 10},
+        'reward': {'coins': 1000, 'luck_points': 100}
+    },
+    'thursday': {
+        'name': 'Training Thursday',
+        'description': 'Use 20 training points',
+        'requirement': {'type': 'training_points_used', 'value': 20},
+        'reward': {'stat_points': 5, 'xp': 300}
+    },
+    'friday': {
+        'name': 'Fight Friday',
+        'description': 'Win 3 PvP battles',
+        'requirement': {'type': 'pvp_wins', 'value': 3},
+        'reward': {'coins': 1500, 'title': 'Weekend Warrior'}
+    },
+    'saturday': {
+        'name': 'Shopping Saturday',
+        'description': 'Buy 5 items from the shop',
+        'requirement': {'type': 'items_purchased', 'value': 5},
+        'reward': {'coins': 800, 'shop_discount': 0.2}
+    },
+    'sunday': {
+        'name': 'Social Sunday',
+        'description': 'Help 3 other players',
+        'requirement': {'type': 'players_helped', 'value': 3},
+        'reward': {'coins': 600, 'friendship_points': 50}
+    }
+}
+
+# Seasonal Events
+SEASONAL_EVENTS = {
+    'cheese_festival': {
+        'name': 'Great Cheese Festival',
+        'description': 'Plagg celebrates with a cheese extravaganza!',
+        'duration': 7,  # days
+        'bonuses': {
+            'exp_multiplier': 2.0,
+            'coin_multiplier': 1.5,
+            'cheese_drop_rate': 3.0
+        },
+        'special_shop': ['Golden_Cheese', 'Cheese_Crown', 'Camembert_Armor'],
+        'special_quests': ['cheese_collector', 'cheese_master', 'cheese_legend']
+    },
+    'miraculous_awakening': {
+        'name': 'Miraculous Awakening',
+        'description': 'The power of miracles grows stronger!',
+        'duration': 10,  # days
+        'bonuses': {
+            'miraculous_power': 2.0,
+            'special_ability_cooldown': 0.5,
+            'rare_drop_rate': 2.0
+        },
+        'special_shop': ['Ladybug_Earrings', 'Cat_Ring', 'Turtle_Bracelet'],
+        'special_quests': ['miracle_seeker', 'hero_training', 'kwami_bond']
+    }
+}
+
+# Legacy System
+LEGACY_MODIFIERS = {
+    'blessed_by_cheese': {
+        'name': 'Blessed by Cheese',
+        'description': 'Plagg smiles upon you',
+        'effects': {'xp_bonus': 0.1, 'luck_bonus': 50},
+        'rarity': 'rare'
+    },
+    'descendant_of_heroes': {
+        'name': 'Descendant of Heroes',
+        'description': 'Hero blood flows through your veins',
+        'effects': {'stat_bonus': 5, 'skill_cooldown_reduction': 0.1},
+        'rarity': 'epic'
+    },
+    'kwami_chosen': {
+        'name': 'Chosen by Kwami',
+        'description': 'A kwami has chosen you as their champion',
+        'effects': {'mana_bonus': 50, 'special_abilities': True},
+        'rarity': 'legendary'
+    },
+    'destruction_master': {
+        'name': 'Master of Destruction',
+        'description': 'You have mastered the power of destruction',
+        'effects': {'destruction_bonus': 0.5, 'cataclysm_power': True},
+        'rarity': 'mythic'
     }
 }
